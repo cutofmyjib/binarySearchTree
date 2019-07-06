@@ -31,10 +31,37 @@ BinTree::~BinTree()
     // height = -1
 }
 
-//PUBLIC FUNCTIONS
-bool getRootData(Data*)
+//PRIVATE FUNCTIONS
+int BinTree::BinTree::getHeightHelper(DataNode *subtreePtr)
 {
+    subtreePtr = rootPtr;
+    if (subtreePtr == nullptr)
+        return 0;
+    else
+        return 1 + std::max(getHeightHelper(subtreePtr->left),
+                       getHeightHelper(subtreePtr->right));
+    
+}
 
+bool BinTree::getRootDataHelper(Data *rootData)
+{
+    if (rootPtr == nullptr)
+    {
+        rootData->id = -1;
+        rootData->information = "";
+        return false;
+    }
+
+    rootData->id = rootPtr->data.id;
+    rootData->information = rootPtr->data.information;
+    return false;
+}
+
+//PUBLIC FUNCTIONS
+int BinTree::getHeight()
+{
+    DataNode *subtreePtr;
+    return getHeightHelper(subtreePtr);
 }
 
 bool BinTree::isEmpty()
@@ -47,4 +74,7 @@ int BinTree::getCount()
     return count;
 }
 
+void BinTree::displayTree()
+{
 
+}

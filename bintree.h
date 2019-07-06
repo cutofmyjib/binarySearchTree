@@ -8,15 +8,15 @@ Purpose: This is the BinTree header file.
 #ifndef BINARY_TREE_H
 #define BINARY_TREE_H
 
+using namespace std;
+
 class BinTree {
 private:
     DataNode *rootPtr;
     int count;
     int height;
-    bool getRootData(Data*);
-    bool isEmpty();
-    int getCount();
-    void displayTree();
+    int getHeightHelper(DataNode *subtreePtr);
+    bool getRootDataHelper(Data*);
 
 public:
     BinTree();
@@ -24,12 +24,16 @@ public:
     bool addNode(int, string);
     bool contains(int);
     bool getNode(Data*, int);
+    bool getRootData(Data*);
+    bool isEmpty();
     bool removeNode(int);
+    int getCount();
     int getHeight();
     void clear();
-    void displayPreOrder();
-    void displayPostOrder();
     void displayInOrder();    
+    void displayPostOrder();
+    void displayPreOrder();
+    void displayTree();
 };
 
 #endif /* BINARY_TREE_H */
