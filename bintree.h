@@ -13,15 +13,7 @@ private:
     DataNode *rootPtr;
     int count;
     int height;
-    bool getRootData(Data*);
-    bool isEmpty();
-    int getCount();
-    void displayTree();
-
-public:
-    BinTree();
-    ~BinTree();
-    bool addNode(int, string);
+     bool addNode(int, string);
     bool contains(int);
     bool getNode(Data*, int);
     bool removeNode(int);
@@ -29,7 +21,16 @@ public:
     void clear();
     void displayPreOrder();
     void displayPostOrder();
-    void displayInOrder();    
+    void displayInOrder();  
+
+public:
+    BinTree();
+    ~BinTree();
+    bool getRootData(Data*);
+    bool isEmpty();
+    int getCount();
+    void displayTree();
+    
 };
 
 #endif /* BINARY_TREE_H */

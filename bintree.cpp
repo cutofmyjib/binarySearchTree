@@ -31,10 +31,19 @@ BinTree::~BinTree()
     // height = -1
 }
 
-//PRIVATE FUNCTIONS
-bool getRootData(Data*)
+//PUBLIC FUNCTIONS
+bool BinTree::getRootData(Data *rootData)
 {
+    if (rootPtr == NULL)
+    {
+        rootData->id = -1;
+        rootData->information = "";
+        return false;
+    }
 
+    rootData->id = rootPtr->data.id;
+    rootData->information = rootPtr->data.information;
+    return true;
 }
 
 bool BinTree::isEmpty()
@@ -46,5 +55,6 @@ int BinTree::getCount()
 {
     return count;
 }
+
 
 
