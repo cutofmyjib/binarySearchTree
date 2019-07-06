@@ -27,37 +27,65 @@ BinTree::BinTree()
 //DESTRUCTOR
 BinTree::~BinTree()
 {
+    //TODO
     // clear();
     // height = -1
 }
 
 //PRIVATE FUNCTIONS
+int BinTree::getCountHelper()
+{
+    return count;
+}
+
 int BinTree::BinTree::getHeightHelper(DataNode *subtreePtr)
 {
     subtreePtr = rootPtr;
     if (subtreePtr == nullptr)
         return 0;
     else
-        return 1 + std::max(getHeightHelper(subtreePtr->left),
-                       getHeightHelper(subtreePtr->right));
-    
+        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
 }
 
-bool BinTree::getRootDataHelper(Data *rootData)
+// bool BinTree::getRootDataHelper(Data *rootData)
+// {
+    // if (rootPtr == nullptr)
+    // {
+    //     rootData->id = -1;
+    //     rootData->information = "";
+    //     return false;
+    // }
+
+    // rootData->id = rootPtr->data.id;
+    // rootData->information = rootPtr->data.information;
+//     return false;
+// }
+
+bool BinTree::isEmptyHelper()
 {
-    if (rootPtr == nullptr)
+    return count ? false : true;
+}
+
+void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
+{
+    subtreePtr = rootPtr;
+    if (!isEmptyHelper())
     {
-        rootData->id = -1;
-        rootData->information = "";
-        return false;
+        cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+        displayPreOrderHelper(subtreePtr->left);
+        displayPreOrderHelper(subtreePtr->right);
     }
 
-    rootData->id = rootPtr->data.id;
-    rootData->information = rootPtr->data.information;
-    return false;
 }
 
+
+
 //PUBLIC FUNCTIONS
+int BinTree::getCount()
+{
+    return getCountHelper();
+}
+
 int BinTree::getHeight()
 {
     DataNode *subtreePtr;
@@ -66,15 +94,28 @@ int BinTree::getHeight()
 
 bool BinTree::isEmpty()
 {
-    return count ? true : false;
+    return isEmptyHelper();
 }
 
-int BinTree::getCount()
+void BinTree::displayPreOrder()
 {
-    return count;
+    DataNode *subtreePtr;
+    displayPreOrderHelper(subtreePtr);
 }
 
 void BinTree::displayTree()
 {
+    string isEmptyTree = isEmpty() ? "Tree is empty" : "Tree is NOT empty";
+    
+    cout << isEmptyTree << endl;
+    cout << "Height " << getHeight() << endl;
+    cout << "Node count: " << getCount() << endl;
 
+    cout << "Pre-Order Traversal" << endl;
+    displayPreOrder();
+    cout << "In-Order Traversal" << endl;
+    // displayInOrder();
+    cout << "Post-Order Traversal" << endl;
+    // displayPostOrder();
 }
+
