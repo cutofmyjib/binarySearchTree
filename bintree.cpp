@@ -31,7 +31,7 @@ BinTree::~BinTree()
     // height = -1
 }
 
-//PRIVATE FUNCTIONS
+//PUBLIC FUNCTIONS
 bool getRootData(Data*)
 {
 
