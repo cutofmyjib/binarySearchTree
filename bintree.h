@@ -22,7 +22,7 @@ private:
     bool getRootDataHelper(Data*);
     bool isEmptyHelper();
     void displayPreOrderHelper(DataNode *subtreePtr);
-    DataNode insertInorder(DataNode *subtreePtr, DataNode *newNode);
+    bool insertInorder(DataNode *subtreePtr, int nodeId, string nodeInfo);
 
 public:
     BinTree();
