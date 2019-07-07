@@ -33,6 +33,36 @@ BinTree::~BinTree()
 }
 
 //PRIVATE FUNCTIONS
+DataNode BinTree::insertInorder(DataNode *subtreePtr, DataNode *newNodePtr)
+{
+    cout << endl;
+    cout << "INSIDE INSERTORDER" << endl;
+    if (subtreePtr == nullptr)
+    {
+        subtreePtr = newNodePtr;
+        count += 1;
+        return *subtreePtr;
+    }
+    else if (subtreePtr->data.id > newNodePtr->data.id)
+        *subtreePtr->left = insertInorder(subtreePtr->left, newNodePtr);
+    else
+        *subtreePtr->right = insertInorder(subtreePtr->right, newNodePtr);
+    
+
+}
+
+bool BinTree::addNodeHelper(int nodeId, string nodeInfo)
+{
+    DataNode *newNodePtr = new DataNode();
+    newNodePtr->data.id = nodeId;
+    newNodePtr->data.information = nodeInfo;
+    newNodePtr->left = nullptr;
+    newNodePtr->right = nullptr;
+
+    insertInorder(rootPtr, newNodePtr);
+    return true;
+}
+
 int BinTree::getCountHelper()
 {
     return count;
@@ -42,7 +72,10 @@ int BinTree::BinTree::getHeightHelper(DataNode *subtreePtr)
 {
     subtreePtr = rootPtr;
     if (subtreePtr == nullptr)
+    {
+        cout << "hello world" << endl;
         return 0;
+    } 
     else
         return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
 }
@@ -81,6 +114,17 @@ void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 
 
 //PUBLIC FUNCTIONS
+bool BinTree::isEmpty()
+{
+    return isEmptyHelper();
+}
+
+bool BinTree::addNode(int nodeId, string nodeInfo)
+{
+    bool isAdded = addNodeHelper(nodeId, nodeInfo);
+    return isAdded;
+}
+
 int BinTree::getCount()
 {
     return getCountHelper();
@@ -90,11 +134,6 @@ int BinTree::getHeight()
 {
     DataNode *subtreePtr;
     return getHeightHelper(subtreePtr);
-}
-
-bool BinTree::isEmpty()
-{
-    return isEmptyHelper();
 }
 
 void BinTree::displayPreOrder()
