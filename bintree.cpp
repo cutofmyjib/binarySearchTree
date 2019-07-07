@@ -68,9 +68,8 @@ int BinTree::getCountHelper()
     return count;
 }
 
-int BinTree::BinTree::getHeightHelper(DataNode *subtreePtr)
+int BinTree::getHeightHelper(DataNode *subtreePtr)
 {
-    subtreePtr = rootPtr;
     if (subtreePtr == nullptr)
     {
         cout << "hello world" << endl;
@@ -132,8 +131,7 @@ int BinTree::getCount()
 
 int BinTree::getHeight()
 {
-    DataNode *subtreePtr;
-    return getHeightHelper(subtreePtr);
+    return getHeightHelper(rootPtr);
 }
 
 void BinTree::displayPreOrder()
