@@ -27,24 +27,132 @@ BinTree::BinTree()
 //DESTRUCTOR
 BinTree::~BinTree()
 {
+    //TODO
     // clear();
     // height = -1
 }
 
-//PUBLIC FUNCTIONS
-bool getRootData(Data*)
+//PRIVATE FUNCTIONS
+DataNode BinTree::insertInorder(DataNode *subtreePtr, DataNode *newNodePtr)
 {
+    cout << endl;
+    cout << "INSIDE INSERTORDER" << endl;
+    if (subtreePtr == nullptr)
+    {
+        subtreePtr = newNodePtr;
+        count += 1;
+        return *subtreePtr;
+    }
+    else if (subtreePtr->data.id > newNodePtr->data.id)
+        *subtreePtr->left = insertInorder(subtreePtr->left, newNodePtr);
+    else
+        *subtreePtr->right = insertInorder(subtreePtr->right, newNodePtr);
+    
 
 }
 
-bool BinTree::isEmpty()
+bool BinTree::addNodeHelper(int nodeId, string nodeInfo)
 {
-    return count ? true : false;
+    DataNode *newNodePtr = new DataNode();
+    newNodePtr->data.id = nodeId;
+    newNodePtr->data.information = nodeInfo;
+    newNodePtr->left = nullptr;
+    newNodePtr->right = nullptr;
+
+    insertInorder(rootPtr, newNodePtr);
+    return true;
 }
 
-int BinTree::getCount()
+int BinTree::getCountHelper()
 {
     return count;
 }
 
+int BinTree::getHeightHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+    {
+        cout << "hello world" << endl;
+        return 0;
+    } 
+    else
+        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+}
+
+// bool BinTree::getRootDataHelper(Data *rootData)
+// {
+    // if (rootPtr == nullptr)
+    // {
+    //     rootData->id = -1;
+    //     rootData->information = "";
+    //     return false;
+    // }
+
+    // rootData->id = rootPtr->data.id;
+    // rootData->information = rootPtr->data.information;
+//     return false;
+// }
+
+bool BinTree::isEmptyHelper()
+{
+    return count ? false : true;
+}
+
+void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
+{
+    subtreePtr = rootPtr;
+    if (!isEmptyHelper())
+    {
+        cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+        displayPreOrderHelper(subtreePtr->left);
+        displayPreOrderHelper(subtreePtr->right);
+    }
+
+}
+
+
+
+//PUBLIC FUNCTIONS
+bool BinTree::isEmpty()
+{
+    return isEmptyHelper();
+}
+
+bool BinTree::addNode(int nodeId, string nodeInfo)
+{
+    bool isAdded = addNodeHelper(nodeId, nodeInfo);
+    return isAdded;
+}
+
+int BinTree::getCount()
+{
+    return getCountHelper();
+}
+
+int BinTree::getHeight()
+{
+    return getHeightHelper(rootPtr);
+}
+
+void BinTree::displayPreOrder()
+{
+    DataNode *subtreePtr;
+    displayPreOrderHelper(subtreePtr);
+}
+
+void BinTree::displayTree()
+{
+    string isEmptyTree = isEmpty() ? "Tree is empty" : "Tree is NOT empty";
+    
+    cout << isEmptyTree << endl;
+    cout << "Height " << getHeight() << endl;
+    cout << "Node count: " << getCount() << endl;
+
+    cout << "Pre-Order Traversal" << endl;
+    displayPreOrder();
+    cout << "In-Order Traversal" << endl;
+    // displayInOrder();
+    cout << "Post-Order Traversal" << endl;
+    // displayPostOrder();
+}
 
