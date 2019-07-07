@@ -18,11 +18,11 @@ private:
     int height;
     int getCountHelper();
     int getHeightHelper(DataNode *subtreePtr);
-    bool addNodeHelper(int, string);
+    bool addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo);
     bool getRootDataHelper(Data*);
     bool isEmptyHelper();
     void displayPreOrderHelper(DataNode *subtreePtr);
-    bool insertInorder(DataNode *subtreePtr, int nodeId, string nodeInfo);
+    // bool insertInorder(DataNode *subtreePtr, int nodeId, string nodeInfo);
 
 public:
     BinTree();

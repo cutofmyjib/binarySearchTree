@@ -33,39 +33,49 @@ BinTree::~BinTree()
 }
 
 //PRIVATE FUNCTIONS
-bool BinTree::insertInorder(DataNode *subtreePtr, int newNodeId, string newNodeInfo)
+// bool BinTree::insertInorder(DataNode *subtreePtr, int newNodeId, string newNodeInfo)
+// {
+// }
+
+bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 {
-    
-    if (subtreePtr == nullptr)
-    {
-        count += 1;
-        DataNode *newNodePtr;
-        newNodePtr = new DataNode();
-        cout << "INSIDE if" << endl;
-        newNodePtr->data.id = newNodeId;
-        newNodePtr->data.information = newNodeInfo;
-        newNodePtr->left = nullptr;
-        newNodePtr->right = nullptr;
+    //  if (subtreePtr == nullptr)
+    // {
+    //     count += 1;
+    //     subtreePtr = new DataNode;
+    //     subtreePtr->data.id = nodeId;
+    //     subtreePtr->data.information = nodeInfo;
+    //     subtreePtr->left = nullptr;
+    //     subtreePtr->right = nullptr;
         
-        subtreePtr = newNodePtr;
-        cout << subtreePtr->data.id << "-----------" << endl;
-        return true;
+    //     cout << subtreePtr->data.id << "-----------" << endl;
+        
+    //     return true;
+    // }
+    if (subtreePtr->data.id > nodeId) {
+        if (!subtreePtr->left) {
+            subtreePtr->left = new DataNode;
+            subtreePtr->left->data.id = nodeId;
+            subtreePtr->left->data.information = nodeInfo;
+            subtreePtr->left->left = nullptr;
+            subtreePtr->left->right = nullptr;
+            return true;
+        } else {
+            addNodeHelper(subtreePtr->left, nodeId, nodeInfo);
+        }
+    } else {
+        if (!subtreePtr->right) {
+            subtreePtr->right = new DataNode;
+            subtreePtr->right->data.id = nodeId;
+            subtreePtr->right->data.information = nodeInfo;
+            subtreePtr->right->left = nullptr;
+            subtreePtr->right->right = nullptr;
+            return true;
+        } else {
+            addNodeHelper(subtreePtr->right, nodeId, nodeInfo);
+        }
     }
-    else if (subtreePtr->data.id > newNodeId)
-        insertInorder(subtreePtr->left, newNodeId, newNodeInfo);
-    else if (subtreePtr->data.id < newNodeId)
-        insertInorder(subtreePtr->right, newNodeId, newNodeInfo);
-    else
-        return false;
-    
 
-}
-
-bool BinTree::addNodeHelper(int nodeId, string nodeInfo)
-{
-    
-    bool isAdded = insertInorder(rootPtr, nodeId, nodeInfo);
-    return isAdded;
 }
 
 int BinTree::getCountHelper()
@@ -77,7 +87,6 @@ int BinTree::getHeightHelper(DataNode *subtreePtr)
 {
     if (subtreePtr == nullptr)
     {
-        cout << "hello world" << endl;
         return 0;
     } 
     else
@@ -108,6 +117,7 @@ void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
     if (!isEmptyHelper())
     {
         cout << "DISPLAYPREORDER HELPER" << endl;
+        cout << (subtreePtr != nullptr ? "GOOD" : "BAD") << endl;
         cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
         displayPreOrderHelper(subtreePtr->left);
         displayPreOrderHelper(subtreePtr->right);
@@ -125,7 +135,20 @@ bool BinTree::isEmpty()
 
 bool BinTree::addNode(int nodeId, string nodeInfo)
 {
-    bool isAdded = addNodeHelper(nodeId, nodeInfo);
+    bool isAdded = false;
+    if (rootPtr != nullptr)
+    {
+        cout << "addNode func rootPTR not nullptr" << endl;
+        isAdded = addNodeHelper(rootPtr, nodeId, nodeInfo);
+    }
+    else 
+    {
+        rootPtr = new DataNode;
+        rootPtr->data.id = nodeId;
+        rootPtr->data.information = nodeInfo;
+        rootPtr->left = nullptr;
+        rootPtr->right = nullptr;
+    }
     return isAdded;
 }
 
@@ -141,7 +164,9 @@ int BinTree::getHeight()
 
 void BinTree::displayPreOrder()
 {
-    displayPreOrderHelper(rootPtr);
+    DataNode *subtreePtr;
+    subtreePtr = rootPtr;
+    displayPreOrderHelper(subtreePtr);
 }
 
 void BinTree::displayTree()
