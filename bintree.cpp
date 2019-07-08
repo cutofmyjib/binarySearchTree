@@ -100,6 +100,88 @@ bool BinTree::isEmptyHelper()
     return count ? false : true;
 }
 
+bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
+{
+    bool minFound = false;
+    //find minimum by traversing to the left of given subtree
+    if (subtreePtr == nullptr){
+        returnNode->id = -1;
+        returnNode->information = "";
+        minFound = false;
+    } else if (subtreePtr->left == nullptr) {
+        cout << "FIND MIN FUNC, MINIMUM: " << subtreePtr->data.id << endl;
+        returnNode->id = subtreePtr->data.id;
+        returnNode->information = subtreePtr->data.information;
+        minFound = true;
+    } else {
+        findMin(subtreePtr->left, returnNode);
+    }
+    return minFound;
+}
+
+bool BinTree::removeNodeHelper(DataNode *subtreePtr, int targetId)
+{
+    bool isRemoved = false;
+    
+    if (subtreePtr == nullptr) {
+        return isRemoved;
+    } else if (targetId < subtreePtr->data.id) {
+        removeNodeHelper(subtreePtr->left, targetId);
+    } else if (targetId > subtreePtr->data.id) {
+        removeNodeHelper(subtreePtr->right, targetId);
+    } else {
+        //node is found
+        cout << "NODE to be deleted FOUND " << endl;
+        cout << subtreePtr->data.id << endl;
+        if (subtreePtr->left == nullptr && subtreePtr->right == nullptr){
+            //case 1: node has no child
+            cout << "case 1 -1111- no children " << subtreePtr->data.id << endl;
+            delete subtreePtr;
+            subtreePtr = nullptr;
+            
+            isRemoved = true;
+        } else if (subtreePtr->left == nullptr) {
+            cout << "case 2 -2222- no left child" << endl;
+            //case 2: node has one child, left child is null
+            DataNode *temp = subtreePtr;
+            //set parent pointing to right child, delete current node found
+            subtreePtr = subtreePtr->right;
+            delete subtreePtr;
+            subtreePtr = nullptr;
+            isRemoved = true;
+        } else if (subtreePtr->right == nullptr) {
+            cout << "case 2 -2222-- no right child" << endl;
+            //case 2: node has one child, right child is null
+            DataNode *temp = subtreePtr;
+            //set parent pointing to right child, delete current node found
+            subtreePtr = subtreePtr->left;
+            delete subtreePtr;
+            isRemoved = true;
+        } else {
+            //case 3: node has 2 children
+            cout << "case 3 -333333- 2 children" << endl;
+            cout << subtreePtr->left->data.id << " <left id" << subtreePtr->right->data.id << " <right id" <<  endl;
+            //find the minimum in right subtree, save id and information
+            Data *temp;
+            temp = new Data;
+            findMin(subtreePtr->right, temp);
+            
+            //to delete the current node, set the value to minimum node data
+            subtreePtr->data.id = temp->id;
+            subtreePtr->data.information = temp->information;
+
+            cout << "calling removenodehelper to delete minimum node" << endl;
+            //delete the original duplicate of minimum node, call remove function recursively
+            removeNodeHelper(subtreePtr->right, temp->id);
+            cout << "back to case 3, removed ------------" << endl;
+            isRemoved = true;
+        }
+    }
+    return isRemoved;
+
+}
+
+
 void BinTree::displayInOrderHelper(DataNode *subtreePtr)
 {
     if (subtreePtr == nullptr)
