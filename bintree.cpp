@@ -33,25 +33,8 @@ BinTree::~BinTree()
 }
 
 //PRIVATE FUNCTIONS
-// bool BinTree::insertInorder(DataNode *subtreePtr, int newNodeId, string newNodeInfo)
-// {
-// }
-
 bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 {
-    //  if (subtreePtr == nullptr)
-    // {
-    //     count += 1;
-    //     subtreePtr = new DataNode;
-    //     subtreePtr->data.id = nodeId;
-    //     subtreePtr->data.information = nodeInfo;
-    //     subtreePtr->left = nullptr;
-    //     subtreePtr->right = nullptr;
-        
-    //     cout << subtreePtr->data.id << "-----------" << endl;
-        
-    //     return true;
-    // }
     if (subtreePtr->data.id > nodeId) {
         if (!subtreePtr->left) {
             subtreePtr->left = new DataNode;
@@ -59,6 +42,9 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
             subtreePtr->left->data.information = nodeInfo;
             subtreePtr->left->left = nullptr;
             subtreePtr->left->right = nullptr;
+
+            count += 1;
+
             return true;
         } else {
             addNodeHelper(subtreePtr->left, nodeId, nodeInfo);
@@ -70,12 +56,14 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
             subtreePtr->right->data.information = nodeInfo;
             subtreePtr->right->left = nullptr;
             subtreePtr->right->right = nullptr;
+
+            count += 1;
+
             return true;
         } else {
             addNodeHelper(subtreePtr->right, nodeId, nodeInfo);
         }
     }
-
 }
 
 int BinTree::getCountHelper()
@@ -93,7 +81,7 @@ int BinTree::getHeightHelper(DataNode *subtreePtr)
         return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
 }
 
-bool BinTree::getRootData(Data *rootData)
+bool BinTree::getRootDataHelper(Data *rootData)
 {
     if (rootPtr == nullptr)
     {
@@ -112,17 +100,34 @@ bool BinTree::isEmptyHelper()
     return count ? false : true;
 }
 
+void BinTree::displayInOrderHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+        return;
+
+    displayInOrderHelper(subtreePtr->left);
+    cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+    displayInOrderHelper(subtreePtr->right);
+}
+
+void BinTree::displayPostOrderHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+        return;
+
+    displayPostOrderHelper(subtreePtr->left);
+    displayPostOrderHelper(subtreePtr->right);
+    cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+}
+
 void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 {
-    if (!isEmptyHelper())
-    {
-        cout << "DISPLAYPREORDER HELPER" << endl;
-        cout << (subtreePtr != nullptr ? "GOOD" : "BAD") << endl;
-        cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
-        displayPreOrderHelper(subtreePtr->left);
-        displayPreOrderHelper(subtreePtr->right);
-    }
+    if (subtreePtr == nullptr)
+        return;
 
+    cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+    displayPreOrderHelper(subtreePtr->left);
+    displayPreOrderHelper(subtreePtr->right);
 }
 
 
@@ -148,8 +153,22 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
         rootPtr->data.information = nodeInfo;
         rootPtr->left = nullptr;
         rootPtr->right = nullptr;
+
+        count += 1;
+
+        return true;
     }
     return isAdded;
+}
+
+bool BinTree::getRootData(Data *rootData)
+{
+    return getRootDataHelper(rootData);
+}
+
+bool BinTree::removeNode(int targetId)
+{
+    return removeNodeHelper(rootPtr, targetId);
 }
 
 int BinTree::getCount()
@@ -162,11 +181,19 @@ int BinTree::getHeight()
     return getHeightHelper(rootPtr);
 }
 
+void BinTree::displayInOrder()
+{
+    displayInOrderHelper(rootPtr);
+}
+
+void BinTree::displayPostOrder()
+{
+    displayPreOrderHelper(rootPtr);
+}
+
 void BinTree::displayPreOrder()
 {
-    DataNode *subtreePtr;
-    subtreePtr = rootPtr;
-    displayPreOrderHelper(subtreePtr);
+    displayPreOrderHelper(rootPtr);
 }
 
 void BinTree::displayTree()
@@ -180,8 +207,7 @@ void BinTree::displayTree()
     cout << "Pre-Order Traversal" << endl;
     displayPreOrder();
     cout << "In-Order Traversal" << endl;
-    // displayInOrder();
+    displayInOrder();
     cout << "Post-Order Traversal" << endl;
-    // displayPostOrder();
+    displayPostOrder();
 }
-
