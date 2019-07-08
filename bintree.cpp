@@ -33,39 +33,37 @@ BinTree::~BinTree()
 }
 
 //PRIVATE FUNCTIONS
-bool BinTree::insertInorder(DataNode *subtreePtr, int newNodeId, string newNodeInfo)
+bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 {
-    
-    if (subtreePtr == nullptr)
-    {
-        count += 1;
-        DataNode *newNodePtr;
-        newNodePtr = new DataNode();
-        cout << "INSIDE if" << endl;
-        newNodePtr->data.id = newNodeId;
-        newNodePtr->data.information = newNodeInfo;
-        newNodePtr->left = nullptr;
-        newNodePtr->right = nullptr;
-        
-        subtreePtr = newNodePtr;
-        cout << subtreePtr->data.id << "-----------" << endl;
-        return true;
+    if (subtreePtr->data.id > nodeId) {
+        if (!subtreePtr->left) {
+            subtreePtr->left = new DataNode;
+            subtreePtr->left->data.id = nodeId;
+            subtreePtr->left->data.information = nodeInfo;
+            subtreePtr->left->left = nullptr;
+            subtreePtr->left->right = nullptr;
+
+            count += 1;
+
+            return true;
+        } else {
+            addNodeHelper(subtreePtr->left, nodeId, nodeInfo);
+        }
+    } else {
+        if (!subtreePtr->right) {
+            subtreePtr->right = new DataNode;
+            subtreePtr->right->data.id = nodeId;
+            subtreePtr->right->data.information = nodeInfo;
+            subtreePtr->right->left = nullptr;
+            subtreePtr->right->right = nullptr;
+
+            count += 1;
+
+            return true;
+        } else {
+            addNodeHelper(subtreePtr->right, nodeId, nodeInfo);
+        }
     }
-    else if (subtreePtr->data.id > newNodeId)
-        insertInorder(subtreePtr->left, newNodeId, newNodeInfo);
-    else if (subtreePtr->data.id < newNodeId)
-        insertInorder(subtreePtr->right, newNodeId, newNodeInfo);
-    else
-        return false;
-    
-
-}
-
-bool BinTree::addNodeHelper(int nodeId, string nodeInfo)
-{
-    
-    bool isAdded = insertInorder(rootPtr, nodeId, nodeInfo);
-    return isAdded;
 }
 
 int BinTree::getCountHelper()
@@ -77,14 +75,13 @@ int BinTree::getHeightHelper(DataNode *subtreePtr)
 {
     if (subtreePtr == nullptr)
     {
-        cout << "hello world" << endl;
         return 0;
     } 
     else
         return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
 }
 
-bool BinTree::getRootData(Data *rootData)
+bool BinTree::getRootDataHelper(Data *rootData)
 {
     if (rootPtr == nullptr)
     {
@@ -103,16 +100,116 @@ bool BinTree::isEmptyHelper()
     return count ? false : true;
 }
 
+bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
+{
+    bool minFound = false;
+    //find minimum by traversing to the left of given subtree
+    if (subtreePtr == nullptr){
+        returnNode->id = -1;
+        returnNode->information = "";
+        minFound = false;
+    } else if (subtreePtr->left == nullptr) {
+        cout << "FIND MIN FUNC, MINIMUM: " << subtreePtr->data.id << endl;
+        returnNode->id = subtreePtr->data.id;
+        returnNode->information = subtreePtr->data.information;
+        minFound = true;
+    } else {
+        findMin(subtreePtr->left, returnNode);
+    }
+    return minFound;
+}
+
+bool BinTree::removeNodeHelper(DataNode *subtreePtr, int targetId)
+{
+    bool isRemoved = false;
+    
+    if (subtreePtr == nullptr) {
+        return isRemoved;
+    } else if (targetId < subtreePtr->data.id) {
+        removeNodeHelper(subtreePtr->left, targetId);
+    } else if (targetId > subtreePtr->data.id) {
+        removeNodeHelper(subtreePtr->right, targetId);
+    } else {
+        //node is found
+        cout << "NODE to be deleted FOUND " << endl;
+        cout << subtreePtr->data.id << endl;
+        if (subtreePtr->left == nullptr && subtreePtr->right == nullptr){
+            //case 1: node has no child
+            cout << "case 1 -1111- no children " << subtreePtr->data.id << endl;
+            delete subtreePtr;
+            subtreePtr = nullptr;
+            
+            isRemoved = true;
+        } else if (subtreePtr->left == nullptr) {
+            cout << "case 2 -2222- no left child" << endl;
+            //case 2: node has one child, left child is null
+            DataNode *temp = subtreePtr;
+            //set parent pointing to right child, delete current node found
+            subtreePtr = subtreePtr->right;
+            delete subtreePtr;
+            subtreePtr = nullptr;
+            isRemoved = true;
+        } else if (subtreePtr->right == nullptr) {
+            cout << "case 2 -2222-- no right child" << endl;
+            //case 2: node has one child, right child is null
+            DataNode *temp = subtreePtr;
+            //set parent pointing to right child, delete current node found
+            subtreePtr = subtreePtr->left;
+            delete subtreePtr;
+            isRemoved = true;
+        } else {
+            //case 3: node has 2 children
+            cout << "case 3 -333333- 2 children" << endl;
+            cout << subtreePtr->left->data.id << " <left id" << subtreePtr->right->data.id << " <right id" <<  endl;
+            //find the minimum in right subtree, save id and information
+            Data *temp;
+            temp = new Data;
+            findMin(subtreePtr->right, temp);
+            
+            //to delete the current node, set the value to minimum node data
+            subtreePtr->data.id = temp->id;
+            subtreePtr->data.information = temp->information;
+
+            cout << "calling removenodehelper to delete minimum node" << endl;
+            //delete the original duplicate of minimum node, call remove function recursively
+            removeNodeHelper(subtreePtr->right, temp->id);
+            cout << "back to case 3, removed ------------" << endl;
+            isRemoved = true;
+        }
+    }
+    return isRemoved;
+
+}
+
+
+void BinTree::displayInOrderHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+        return;
+
+    displayInOrderHelper(subtreePtr->left);
+    cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+    displayInOrderHelper(subtreePtr->right);
+}
+
+void BinTree::displayPostOrderHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+        return;
+
+    displayPostOrderHelper(subtreePtr->left);
+    displayPostOrderHelper(subtreePtr->right);
+    cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+}
+
 void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 {
-    if (!isEmptyHelper())
-    {
-        cout << "DISPLAYPREORDER HELPER" << endl;
-        cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
-        displayPreOrderHelper(subtreePtr->left);
-        displayPreOrderHelper(subtreePtr->right);
-    }
+    if (subtreePtr == nullptr)
+        return;
 
+    cout << subtreePtr->data.id << " " << subtreePtr->data.information << endl;
+    displayPreOrderHelper(subtreePtr->left);
+    displayPreOrderHelper(subtreePtr->right);
 }
 
 
@@ -125,8 +222,35 @@ bool BinTree::isEmpty()
 
 bool BinTree::addNode(int nodeId, string nodeInfo)
 {
-    bool isAdded = addNodeHelper(nodeId, nodeInfo);
+    bool isAdded = false;
+    if (rootPtr != nullptr)
+    {
+        cout << "addNode func rootPTR not nullptr" << endl;
+        isAdded = addNodeHelper(rootPtr, nodeId, nodeInfo);
+    }
+    else 
+    {
+        rootPtr = new DataNode;
+        rootPtr->data.id = nodeId;
+        rootPtr->data.information = nodeInfo;
+        rootPtr->left = nullptr;
+        rootPtr->right = nullptr;
+
+        count += 1;
+
+        return true;
+    }
     return isAdded;
+}
+
+bool BinTree::getRootData(Data *rootData)
+{
+    return getRootDataHelper(rootData);
+}
+
+bool BinTree::removeNode(int targetId)
+{
+    return removeNodeHelper(rootPtr, targetId);
 }
 
 int BinTree::getCount()
@@ -137,6 +261,16 @@ int BinTree::getCount()
 int BinTree::getHeight()
 {
     return getHeightHelper(rootPtr);
+}
+
+void BinTree::displayInOrder()
+{
+    displayInOrderHelper(rootPtr);
+}
+
+void BinTree::displayPostOrder()
+{
+    displayPreOrderHelper(rootPtr);
 }
 
 void BinTree::displayPreOrder()
@@ -155,8 +289,7 @@ void BinTree::displayTree()
     cout << "Pre-Order Traversal" << endl;
     displayPreOrder();
     cout << "In-Order Traversal" << endl;
-    // displayInOrder();
+    displayInOrder();
     cout << "Post-Order Traversal" << endl;
-    // displayPostOrder();
+    displayPostOrder();
 }
-
