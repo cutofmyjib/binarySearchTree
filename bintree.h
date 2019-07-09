@@ -22,7 +22,7 @@ private:
     bool addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo);
     bool getRootDataHelper(Data*);
     bool isEmptyHelper();
-    bool removeNodeHelper(DataNode *subtreePtr, int targetId);
+    bool removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targetId);
     void displayInOrderHelper(DataNode *subtreePtr);
     void displayPostOrderHelper(DataNode *subtreePtr);
     void displayPreOrderHelper(DataNode *subtreePtr);
