@@ -66,19 +66,22 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
     }
 }
 
-int BinTree::getCountHelper()
+bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
 {
-    return count;
-}
-
-int BinTree::getHeightHelper(DataNode *subtreePtr)
-{
-    if (subtreePtr == nullptr)
-    {
-        return 0;
-    } 
-    else
-        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+    bool minFound = false;
+    //find minimum by traversing to the left of given subtree
+    if (subtreePtr == nullptr){
+        returnNode->id = -1;
+        returnNode->information = "";
+        minFound = false;
+    } else if (subtreePtr->left == nullptr) {
+        returnNode->id = subtreePtr->data.id;
+        returnNode->information = subtreePtr->data.information;
+        minFound = true;
+    } else {
+        findMin(subtreePtr->left, returnNode);
+    }
+    return minFound;
 }
 
 bool BinTree::getRootDataHelper(Data *rootData)
@@ -100,67 +103,41 @@ bool BinTree::isEmptyHelper()
     return count ? false : true;
 }
 
-bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
-{
-    bool minFound = false;
-    //find minimum by traversing to the left of given subtree
-    if (subtreePtr == nullptr){
-        returnNode->id = -1;
-        returnNode->information = "";
-        minFound = false;
-    } else if (subtreePtr->left == nullptr) {
-        cout << "FIND MIN FUNC, MINIMUM: " << subtreePtr->data.id << endl;
-        returnNode->id = subtreePtr->data.id;
-        returnNode->information = subtreePtr->data.information;
-        minFound = true;
-    } else {
-        findMin(subtreePtr->left, returnNode);
-    }
-    return minFound;
-}
-
-bool BinTree::removeNodeHelper(DataNode *subtreePtr, int targetId)
+bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targetId)
 {
     bool isRemoved = false;
     
     if (subtreePtr == nullptr) {
         return isRemoved;
-    } else if (targetId < subtreePtr->data.id) {
-        removeNodeHelper(subtreePtr->left, targetId);
+    } 
+    
+    if (targetId < subtreePtr->data.id) {
+        removeNodeHelper(parent, subtreePtr->left, targetId);
     } else if (targetId > subtreePtr->data.id) {
-        removeNodeHelper(subtreePtr->right, targetId);
+        removeNodeHelper(parent, subtreePtr->right, targetId);
     } else {
+
         //node is found
-        cout << "NODE to be deleted FOUND " << endl;
-        cout << subtreePtr->data.id << endl;
-        if (subtreePtr->left == nullptr && subtreePtr->right == nullptr){
-            //case 1: node has no child
-            cout << "case 1 -1111- no children " << subtreePtr->data.id << endl;
+        if (subtreePtr->left == nullptr || subtreePtr->right == nullptr){
+            //if current node has no child or one child
+            DataNode *tempLeft = subtreePtr->left;
+            DataNode *tempRight = subtreePtr->right;
+
+            if (parent) {
+                if (parent->left == subtreePtr) {
+                    parent->left = tempLeft;
+                } else {
+                    parent->right = tempRight;
+                }
+            } else {
+                rootPtr = tempLeft ? tempLeft : tempRight;
+            }
             delete subtreePtr;
             subtreePtr = nullptr;
-            
-            isRemoved = true;
-        } else if (subtreePtr->left == nullptr) {
-            cout << "case 2 -2222- no left child" << endl;
-            //case 2: node has one child, left child is null
-            DataNode *temp = subtreePtr;
-            //set parent pointing to right child, delete current node found
-            subtreePtr = subtreePtr->right;
-            delete subtreePtr;
-            subtreePtr = nullptr;
-            isRemoved = true;
-        } else if (subtreePtr->right == nullptr) {
-            cout << "case 2 -2222-- no right child" << endl;
-            //case 2: node has one child, right child is null
-            DataNode *temp = subtreePtr;
-            //set parent pointing to right child, delete current node found
-            subtreePtr = subtreePtr->left;
-            delete subtreePtr;
+            count -= 1;
             isRemoved = true;
         } else {
-            //case 3: node has 2 children
-            cout << "case 3 -333333- 2 children" << endl;
-            cout << subtreePtr->left->data.id << " <left id" << subtreePtr->right->data.id << " <right id" <<  endl;
+            //if node has 2 children
             //find the minimum in right subtree, save id and information
             Data *temp;
             temp = new Data;
@@ -170,10 +147,9 @@ bool BinTree::removeNodeHelper(DataNode *subtreePtr, int targetId)
             subtreePtr->data.id = temp->id;
             subtreePtr->data.information = temp->information;
 
-            cout << "calling removenodehelper to delete minimum node" << endl;
             //delete the original duplicate of minimum node, call remove function recursively
-            removeNodeHelper(subtreePtr->right, temp->id);
-            cout << "back to case 3, removed ------------" << endl;
+            removeNodeHelper(subtreePtr, subtreePtr->right, temp->id);
+
             isRemoved = true;
         }
     }
@@ -181,6 +157,20 @@ bool BinTree::removeNodeHelper(DataNode *subtreePtr, int targetId)
 
 }
 
+int BinTree::getCountHelper()
+{
+    return count;
+}
+
+int BinTree::getHeightHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+    {
+        return 0;
+    } 
+    else
+        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+}
 
 void BinTree::displayInOrderHelper(DataNode *subtreePtr)
 {
@@ -213,13 +203,7 @@ void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 }
 
 
-
 //PUBLIC FUNCTIONS
-bool BinTree::isEmpty()
-{
-    return isEmptyHelper();
-}
-
 bool BinTree::addNode(int nodeId, string nodeInfo)
 {
     bool isAdded = false;
@@ -243,6 +227,11 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
     return isAdded;
 }
 
+bool BinTree::isEmpty()
+{
+    return isEmptyHelper();
+}
+
 bool BinTree::getRootData(Data *rootData)
 {
     return getRootDataHelper(rootData);
@@ -250,7 +239,7 @@ bool BinTree::getRootData(Data *rootData)
 
 bool BinTree::removeNode(int targetId)
 {
-    return removeNodeHelper(rootPtr, targetId);
+    return removeNodeHelper(NULL, rootPtr, targetId);
 }
 
 int BinTree::getCount()
