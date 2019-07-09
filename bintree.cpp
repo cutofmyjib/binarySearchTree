@@ -66,19 +66,22 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
     }
 }
 
-int BinTree::getCountHelper()
+bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
 {
-    return count;
-}
-
-int BinTree::getHeightHelper(DataNode *subtreePtr)
-{
-    if (subtreePtr == nullptr)
-    {
-        return 0;
-    } 
-    else
-        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+    bool minFound = false;
+    //find minimum by traversing to the left of given subtree
+    if (subtreePtr == nullptr){
+        returnNode->id = -1;
+        returnNode->information = "";
+        minFound = false;
+    } else if (subtreePtr->left == nullptr) {
+        returnNode->id = subtreePtr->data.id;
+        returnNode->information = subtreePtr->data.information;
+        minFound = true;
+    } else {
+        findMin(subtreePtr->left, returnNode);
+    }
+    return minFound;
 }
 
 bool BinTree::getRootDataHelper(Data *rootData)
@@ -98,24 +101,6 @@ bool BinTree::getRootDataHelper(Data *rootData)
 bool BinTree::isEmptyHelper()
 {
     return count ? false : true;
-}
-
-bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
-{
-    bool minFound = false;
-    //find minimum by traversing to the left of given subtree
-    if (subtreePtr == nullptr){
-        returnNode->id = -1;
-        returnNode->information = "";
-        minFound = false;
-    } else if (subtreePtr->left == nullptr) {
-        returnNode->id = subtreePtr->data.id;
-        returnNode->information = subtreePtr->data.information;
-        minFound = true;
-    } else {
-        findMin(subtreePtr->left, returnNode);
-    }
-    return minFound;
 }
 
 bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targetId)
@@ -172,6 +157,20 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
 
 }
 
+int BinTree::getCountHelper()
+{
+    return count;
+}
+
+int BinTree::getHeightHelper(DataNode *subtreePtr)
+{
+    if (subtreePtr == nullptr)
+    {
+        return 0;
+    } 
+    else
+        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+}
 
 void BinTree::displayInOrderHelper(DataNode *subtreePtr)
 {
@@ -204,13 +203,7 @@ void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 }
 
 
-
 //PUBLIC FUNCTIONS
-bool BinTree::isEmpty()
-{
-    return isEmptyHelper();
-}
-
 bool BinTree::addNode(int nodeId, string nodeInfo)
 {
     bool isAdded = false;
@@ -232,6 +225,11 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
         return true;
     }
     return isAdded;
+}
+
+bool BinTree::isEmpty()
+{
+    return isEmptyHelper();
 }
 
 bool BinTree::getRootData(Data *rootData)
