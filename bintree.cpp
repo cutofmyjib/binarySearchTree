@@ -27,9 +27,7 @@ BinTree::BinTree()
 //DESTRUCTOR
 BinTree::~BinTree()
 {
-    //TODO
-    // clear();
-    // height = -1
+    clearHelper(rootPtr);
 }
 
 //PRIVATE FUNCTIONS
@@ -84,6 +82,26 @@ bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
     return minFound;
 }
 
+bool BinTree::getNodeHelper(DataNode *subtreePtr, Data *returnNode, int targetId)
+{
+    bool nodeFound = false;
+    
+    if (subtreePtr == nullptr){
+        returnNode->id = -1;
+        returnNode->information = "";
+        nodeFound = false;
+    } else if (targetId > subtreePtr->data.id) {
+        getNodeHelper(subtreePtr->right, returnNode, targetId);
+    } else if (targetId < subtreePtr->data.id) {
+        getNodeHelper(subtreePtr->left, returnNode, targetId);
+    } else {
+        returnNode->id = subtreePtr->data.id;
+        returnNode->information = subtreePtr->data.information;
+        nodeFound = true;
+    } 
+    return nodeFound;
+}
+
 bool BinTree::getRootDataHelper(Data *rootData)
 {
     if (rootPtr == nullptr)
@@ -126,15 +144,18 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
             if (parent) {
                 if (parent->left == subtreePtr) {
                     parent->left = tempLeft;
+                    count--;
                 } else {
                     parent->right = tempRight;
+                    count--;
                 }
             } else {
                 rootPtr = tempLeft ? tempLeft : tempRight;
+                count--;
             }
             delete subtreePtr;
             subtreePtr = nullptr;
-            count -= 1;
+            count--;
             isRemoved = true;
         } else {
             //if node has 2 children
@@ -151,6 +172,7 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
             removeNodeHelper(subtreePtr, subtreePtr->right, temp->id);
 
             isRemoved = true;
+            count--;
         }
     }
     return isRemoved;
@@ -164,12 +186,25 @@ int BinTree::getCountHelper()
 
 int BinTree::getHeightHelper(DataNode *subtreePtr)
 {
-    if (subtreePtr == nullptr)
-    {
+    
+    if (subtreePtr == nullptr) {
         return 0;
     } 
-    else
+    else {
         return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+    }
+}
+
+void BinTree::clearHelper(DataNode *subtreePtr)
+{
+    DataNode *garbage = subtreePtr;
+    if (garbage) {
+        removeNodeHelper(NULL, garbage->left, garbage->left->data.id);
+        removeNodeHelper(NULL, garbage->right, garbage->right->data.id);
+        delete garbage;
+        
+    }
+    count = 0;
 }
 
 void BinTree::displayInOrderHelper(DataNode *subtreePtr)
@@ -209,7 +244,6 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
     bool isAdded = false;
     if (rootPtr != nullptr)
     {
-        cout << "addNode func rootPTR not nullptr" << endl;
         isAdded = addNodeHelper(rootPtr, nodeId, nodeInfo);
     }
     else 
@@ -220,7 +254,7 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
         rootPtr->left = nullptr;
         rootPtr->right = nullptr;
 
-        count += 1;
+        count++;
 
         return true;
     }
@@ -230,6 +264,11 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
 bool BinTree::isEmpty()
 {
     return isEmptyHelper();
+}
+
+bool BinTree::getNode(Data *returnNode, int targetId)
+{
+    return getNodeHelper(rootPtr, returnNode, targetId);
 }
 
 bool BinTree::getRootData(Data *rootData)
@@ -260,6 +299,11 @@ void BinTree::displayInOrder()
 void BinTree::displayPostOrder()
 {
     displayPreOrderHelper(rootPtr);
+}
+
+void BinTree::clear()
+{
+    clearHelper(rootPtr);
 }
 
 void BinTree::displayPreOrder()
