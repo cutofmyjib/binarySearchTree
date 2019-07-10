@@ -19,6 +19,7 @@ private:
     int getCountHelper();
     int getHeightHelper(DataNode *subtreePtr);
     bool addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo);
+    bool containsHelper(DataNode *subtreePtr, int targetId);
     bool findMin(DataNode *subtreePtr, Data *returnNode);
     bool getNodeHelper(DataNode *subtreePtr, Data *returnNode, int targetId);
     bool getRootDataHelper(Data*);

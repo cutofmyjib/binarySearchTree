@@ -33,6 +33,7 @@ BinTree::~BinTree()
 //PRIVATE FUNCTIONS
 bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 {
+    bool isAdded = false;
     if (subtreePtr->data.id > nodeId) {
         if (!subtreePtr->left) {
             subtreePtr->left = new DataNode;
@@ -43,7 +44,7 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 
             count += 1;
 
-            return true;
+            isAdded = true;
         } else {
             addNodeHelper(subtreePtr->left, nodeId, nodeInfo);
         }
@@ -57,11 +58,31 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 
             count += 1;
 
-            return true;
+            isAdded = true;
         } else {
             addNodeHelper(subtreePtr->right, nodeId, nodeInfo);
         }
     }
+    return isAdded;
+}
+
+bool BinTree::containsHelper(DataNode *subtreePtr, int targetId)
+{
+    bool treeContains = false;
+
+    if (subtreePtr == nullptr) {
+        treeContains = false;
+    } else if (subtreePtr->data.id == targetId){
+        treeContains = true;
+    } else if (targetId > subtreePtr->data.id) {
+        return containsHelper(subtreePtr->right, targetId);
+    } else if (targetId < subtreePtr->data.id) {
+        return containsHelper(subtreePtr->left, targetId);
+    } else {
+        treeContains = false;
+    }
+
+    return treeContains;
 }
 
 bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
@@ -91,14 +112,16 @@ bool BinTree::getNodeHelper(DataNode *subtreePtr, Data *returnNode, int targetId
         returnNode->information = "";
         nodeFound = false;
     } else if (targetId > subtreePtr->data.id) {
-        getNodeHelper(subtreePtr->right, returnNode, targetId);
+        return getNodeHelper(subtreePtr->right, returnNode, targetId);
     } else if (targetId < subtreePtr->data.id) {
-        getNodeHelper(subtreePtr->left, returnNode, targetId);
-    } else {
+        return getNodeHelper(subtreePtr->left, returnNode, targetId);
+    } else if (targetId == subtreePtr->data.id) {
         returnNode->id = subtreePtr->data.id;
         returnNode->information = subtreePtr->data.information;
         nodeFound = true;
-    } 
+    } else {
+        nodeFound = false;
+    }
     return nodeFound;
 }
 
@@ -110,9 +133,10 @@ bool BinTree::getRootDataHelper(Data *rootData)
         rootData->information = "";
         return false;
     }
-
+    
     rootData->id = rootPtr->data.id;
     rootData->information = rootPtr->data.information;
+    
     return true;
 }
 
@@ -239,6 +263,10 @@ void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 
 
 //PUBLIC FUNCTIONS
+bool BinTree::contains(int targetId){
+    return containsHelper(rootPtr, targetId);
+}
+
 bool BinTree::addNode(int nodeId, string nodeInfo)
 {
     bool isAdded = false;
