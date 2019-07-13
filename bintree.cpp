@@ -27,14 +27,13 @@ BinTree::BinTree()
 //DESTRUCTOR
 BinTree::~BinTree()
 {
-    //TODO
-    // clear();
-    // height = -1
+    clearHelper(rootPtr);
 }
 
 //PRIVATE FUNCTIONS
 bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 {
+    bool isAdded = false;
     if (subtreePtr->data.id > nodeId) {
         if (!subtreePtr->left) {
             subtreePtr->left = new DataNode;
@@ -45,7 +44,7 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 
             count += 1;
 
-            return true;
+            isAdded = true;
         } else {
             addNodeHelper(subtreePtr->left, nodeId, nodeInfo);
         }
@@ -59,11 +58,31 @@ bool BinTree::addNodeHelper(DataNode *subtreePtr, int nodeId, string nodeInfo)
 
             count += 1;
 
-            return true;
+            isAdded = true;
         } else {
             addNodeHelper(subtreePtr->right, nodeId, nodeInfo);
         }
     }
+    return isAdded;
+}
+
+bool BinTree::containsHelper(DataNode *subtreePtr, int targetId)
+{
+    bool treeContains = false;
+
+    if (subtreePtr == nullptr) {
+        treeContains = false;
+    } else if (subtreePtr->data.id == targetId){
+        treeContains = true;
+    } else if (targetId > subtreePtr->data.id) {
+        return containsHelper(subtreePtr->right, targetId);
+    } else if (targetId < subtreePtr->data.id) {
+        return containsHelper(subtreePtr->left, targetId);
+    } else {
+        treeContains = false;
+    }
+
+    return treeContains;
 }
 
 bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
@@ -84,6 +103,28 @@ bool BinTree::findMin(DataNode *subtreePtr, Data *returnNode)
     return minFound;
 }
 
+bool BinTree::getNodeHelper(DataNode *subtreePtr, Data *returnNode, int targetId)
+{
+    bool nodeFound = false;
+    
+    if (subtreePtr == nullptr){
+        returnNode->id = -1;
+        returnNode->information = "";
+        nodeFound = false;
+    } else if (targetId > subtreePtr->data.id) {
+        return getNodeHelper(subtreePtr->right, returnNode, targetId);
+    } else if (targetId < subtreePtr->data.id) {
+        return getNodeHelper(subtreePtr->left, returnNode, targetId);
+    } else if (targetId == subtreePtr->data.id) {
+        returnNode->id = subtreePtr->data.id;
+        returnNode->information = subtreePtr->data.information;
+        nodeFound = true;
+    } else {
+        nodeFound = false;
+    }
+    return nodeFound;
+}
+
 bool BinTree::getRootDataHelper(Data *rootData)
 {
     if (rootPtr == nullptr)
@@ -92,9 +133,10 @@ bool BinTree::getRootDataHelper(Data *rootData)
         rootData->information = "";
         return false;
     }
-
+    
     rootData->id = rootPtr->data.id;
     rootData->information = rootPtr->data.information;
+    
     return true;
 }
 
@@ -108,33 +150,38 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
     bool isRemoved = false;
     
     if (subtreePtr == nullptr) {
+        isRemoved = false;
         return isRemoved;
     } 
     
     if (targetId < subtreePtr->data.id) {
-        removeNodeHelper(parent, subtreePtr->left, targetId);
+        removeNodeHelper(subtreePtr, subtreePtr->left, targetId);
     } else if (targetId > subtreePtr->data.id) {
-        removeNodeHelper(parent, subtreePtr->right, targetId);
+        removeNodeHelper(subtreePtr, subtreePtr->right, targetId);
     } else {
-
         //node is found
         if (subtreePtr->left == nullptr || subtreePtr->right == nullptr){
+            
             //if current node has no child or one child
-            DataNode *tempLeft = subtreePtr->left;
-            DataNode *tempRight = subtreePtr->right;
+            //set the current node's only child to a tempNode pointer
+            DataNode *tempNode;
+            tempNode = subtreePtr->left;
+            if (subtreePtr->right) {
+                tempNode = subtreePtr->right;
+            }
 
             if (parent) {
                 if (parent->left == subtreePtr) {
-                    parent->left = tempLeft;
+                    parent->left = tempNode;
                 } else {
-                    parent->right = tempRight;
+                    parent->right = tempNode;
                 }
             } else {
-                rootPtr = tempLeft ? tempLeft : tempRight;
+                rootPtr = tempNode;
             }
             delete subtreePtr;
             subtreePtr = nullptr;
-            count -= 1;
+            count--;
             isRemoved = true;
         } else {
             //if node has 2 children
@@ -149,8 +196,6 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
 
             //delete the original duplicate of minimum node, call remove function recursively
             removeNodeHelper(subtreePtr, subtreePtr->right, temp->id);
-
-            isRemoved = true;
         }
     }
     return isRemoved;
@@ -164,12 +209,35 @@ int BinTree::getCountHelper()
 
 int BinTree::getHeightHelper(DataNode *subtreePtr)
 {
-    if (subtreePtr == nullptr)
-    {
-        return 0;
+    int height = 0;
+    if (subtreePtr == nullptr) {
+        return height;
     } 
-    else
-        return 1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right));
+    else {
+        height = (1 + std::max(getHeightHelper(subtreePtr->left), getHeightHelper(subtreePtr->right)));
+    }
+
+    return height;
+}
+
+void BinTree::clearHelper(DataNode *subtreePtr)
+{
+    DataNode *garbage;
+    garbage = subtreePtr;
+    
+    if (garbage) {
+        if (garbage->left)
+            removeNodeHelper(nullptr, garbage->left, garbage->left->data.id);
+        
+        if (garbage->right)
+            removeNodeHelper(nullptr, garbage->right, garbage->right->data.id);
+        
+        if (garbage == rootPtr) {
+            delete rootPtr;
+            rootPtr = nullptr;
+        }
+    }
+    count = 0;
 }
 
 void BinTree::displayInOrderHelper(DataNode *subtreePtr)
@@ -204,12 +272,15 @@ void BinTree::displayPreOrderHelper(DataNode *subtreePtr)
 
 
 //PUBLIC FUNCTIONS
+bool BinTree::contains(int targetId){
+    return containsHelper(rootPtr, targetId);
+}
+
 bool BinTree::addNode(int nodeId, string nodeInfo)
 {
     bool isAdded = false;
     if (rootPtr != nullptr)
     {
-        cout << "addNode func rootPTR not nullptr" << endl;
         isAdded = addNodeHelper(rootPtr, nodeId, nodeInfo);
     }
     else 
@@ -220,7 +291,7 @@ bool BinTree::addNode(int nodeId, string nodeInfo)
         rootPtr->left = nullptr;
         rootPtr->right = nullptr;
 
-        count += 1;
+        count++;
 
         return true;
     }
@@ -232,6 +303,11 @@ bool BinTree::isEmpty()
     return isEmptyHelper();
 }
 
+bool BinTree::getNode(Data *returnNode, int targetId)
+{
+    return getNodeHelper(rootPtr, returnNode, targetId);
+}
+
 bool BinTree::getRootData(Data *rootData)
 {
     return getRootDataHelper(rootData);
@@ -239,7 +315,7 @@ bool BinTree::getRootData(Data *rootData)
 
 bool BinTree::removeNode(int targetId)
 {
-    return removeNodeHelper(NULL, rootPtr, targetId);
+    return removeNodeHelper(nullptr, rootPtr, targetId);
 }
 
 int BinTree::getCount()
@@ -259,7 +335,12 @@ void BinTree::displayInOrder()
 
 void BinTree::displayPostOrder()
 {
-    displayPreOrderHelper(rootPtr);
+    displayPostOrderHelper(rootPtr);
+}
+
+void BinTree::clear()
+{
+    clearHelper(rootPtr);
 }
 
 void BinTree::displayPreOrder()
