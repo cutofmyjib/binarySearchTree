@@ -9,6 +9,7 @@ Purpose: This is the main header file.
 
 #include <iostream>
 #include "bintree.h"
+#include "data.h"
 #include "functions.h"
 
 #define TREESIZE1 7

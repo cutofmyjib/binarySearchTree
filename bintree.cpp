@@ -15,7 +15,6 @@ return true. If it does not exist, place -1 and an empty string in the Data stru
 ■ getHeight(): integer -- Return the height of the tree
 ***********************************************************/
 #include "bintree.h"
-#include "data.h"
 
 //CONSTRUCTOR
 BinTree::BinTree()
@@ -155,9 +154,9 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
     } 
     
     if (targetId < subtreePtr->data.id) {
-        removeNodeHelper(subtreePtr, subtreePtr->left, targetId);
+        isRemoved = removeNodeHelper(subtreePtr, subtreePtr->left, targetId);
     } else if (targetId > subtreePtr->data.id) {
-        removeNodeHelper(subtreePtr, subtreePtr->right, targetId);
+        isRemoved = removeNodeHelper(subtreePtr, subtreePtr->right, targetId);
     } else {
         //node is found
         if (subtreePtr->left == nullptr || subtreePtr->right == nullptr){
@@ -195,7 +194,7 @@ bool BinTree::removeNodeHelper(DataNode *parent, DataNode *subtreePtr, int targe
             subtreePtr->data.information = temp->information;
 
             //delete the original duplicate of minimum node, call remove function recursively
-            removeNodeHelper(subtreePtr, subtreePtr->right, temp->id);
+            isRemoved = removeNodeHelper(subtreePtr, subtreePtr->right, temp->id);
         }
     }
     return isRemoved;
@@ -232,11 +231,10 @@ void BinTree::clearHelper(DataNode *subtreePtr)
         if (garbage->right)
             removeNodeHelper(nullptr, garbage->right, garbage->right->data.id);
         
-        if (garbage == rootPtr) {
-            delete rootPtr;
-            rootPtr = nullptr;
-        }
     }
+
+    delete rootPtr;
+    rootPtr = nullptr;
     count = 0;
 }
 
